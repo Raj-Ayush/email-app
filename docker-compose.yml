@@ -1,0 +1,44 @@
+version: '3.7'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - elk
+
+  app:
+    build: .
+    container_name: email_app
+    environment:
+      - ELASTICSEARCH_HOST=http://elasticsearch:9200
+      - OUTLOOK_CLIENT_ID=${OUTLOOK_CLIENT_ID}
+      - OUTLOOK_CLIENT_SECRET=${OUTLOOK_CLIENT_SECRET}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - REDIRECT_URI=${REDIRECT_URI}
+      - TENANT_ID=${TENANT_ID}
+      - PORT=${PORT}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - elasticsearch
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - elk
+    command: "npm start"
+
+networks:
+  elk:
+    driver: bridge
+
+volumes:
+  esdata:
+    driver: local

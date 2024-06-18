@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+</head>
+<body>
+  <h1>Welcome</h1>
+  <div id="email-sync-status"></div>
+  <script>
+    async function fetchEmails() {
+      const response = await fetch('/api/emails');
+      const emails = await response.json();
+      const emailList = document.getElementById('email-sync-status');
+      emailList.innerHTML = '<h2>Email Sync Status</h2>';
+      emails.forEach(email => {
+        const emailItem = document.createElement('div');
+        emailItem.innerHTML = `<strong>${email.subject}</strong> - ${email.from}`;
+        emailList.appendChild(emailItem);
+      });
+    }
+
+    fetchEmails();
+  </script>
+</body>
+</html>
